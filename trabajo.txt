@@ -1,0 +1,17 @@
+-PEDRO
+
+
+
+-- AMADO
+
+-- ADALBERTO
+
+-- PABLO
+
+PAQUETE A (Opcion de ventas (Menu principal)) -> AMADO
+PAQUETE B (Categorias, Productos, Cliente) -> PABLO
+PAQUETE C (Ventas (Reporte), Productos (Reporte) ) -> PEDRO
+PAQUETE D (Clientes (Reporte)) -> ADALBERTO
+
+
+       

@@ -234,7 +234,7 @@ void ventas()
 		printf("\n\n\t1.-Crear Venta\n\n");
 		printf("\t2.-Abonos\n\n");
 		printf("\t3.-Consultar Ventas\n\n");
-		printf("\t4.-Mofificar Ventas\n\n");
+		printf("\t4.-Mofificar Ventas *\n\n");
 		printf("\t5.-Regresar al menu principal\n\n");
 
 		printf("Elige una opcion:");
