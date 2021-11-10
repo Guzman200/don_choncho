@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 				break;
 
 			case 5:
-				reportes();
+				reportes(argc, argv);
 				break;
 
 			case 6:
@@ -517,10 +517,12 @@ void productos()
 	} while (opcProducto != 5);
 } //FIN VOID PRODUCTOS
 
-void reportes()
+void reportes(int argc, char *argv[])
 {
 
 	int opcReportes, opcF, opcV, opcC, opcP, opcCF, opcCF2, opcC1, opcC2, opcC3;
+	char cadena[200];
+
 	do
 	{
 		printf("REPORTES\n");
@@ -631,17 +633,41 @@ void reportes()
 				switch (opcV)
 				{
 				case 1:
-					printf("\n\n\n\n\tCredito\n");
+					printf("\n\n\n\n\tVentas a credito\n");
+
+					sprintf(cadena, "select_ventas_credito|SELECT * FROM ventas where credito = true;");
+
+					t_ini = clock();
+					executeServidorSelects(argc, argv, cadena);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 					break;
 
 				case 2:
 					printf("\n\n\n\n\tContado\n");
 
+					sprintf(cadena, "select_ventas_contado|SELECT * FROM ventas where credito = false;");
+
+					t_ini = clock();
+					executeServidorSelects(argc, argv, cadena);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
 					break;
 
 				case 3:
 					printf("\n\n\n\n\tVer todas\n");
+
+					sprintf(cadena, "select_ventas_todas|SELECT * FROM ventas");
+
+					t_ini = clock();
+					executeServidorSelects(argc, argv, cadena);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 					break;
 

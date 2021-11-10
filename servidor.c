@@ -263,6 +263,13 @@ int main()
 
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
+
+			}else if(strstr(token, "select_ventas_credito"){
+
+			}else if(strstr(token, "select_ventas_contado"){
+
+			}else if(strstr(token, "select_ventas_todas"){
+
 			}
 		}
 	}
