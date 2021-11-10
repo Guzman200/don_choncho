@@ -14,7 +14,7 @@
 
 #define PORT 3550 /* El puerto que será abierto */
 #define BACKLOG 2 /* El número de conexiones permitidas */
-#define MAXDATASIZE 200
+#define MAXDATASIZE 500
 
 /*
   Funciones con semaforo
@@ -97,7 +97,7 @@ int main()
 
 	int i, j;
 
-	char row[200];
+	char row[500];
 
 	/* para la información de la dirección del servidor */
 	struct sockaddr_in server;
@@ -234,7 +234,7 @@ int main()
 				down(idsem);
 				printf("\n ==== En region critica ====\n");
 
-				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
 
 				if (PQstatus(conn) != CONNECTION_BAD){
 
@@ -274,7 +274,7 @@ void execute(char *sql)
 	PGconn *conn;
 	PGresult *ress;
 
-	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
 
 	if (PQstatus(conn) != CONNECTION_BAD){
 
@@ -304,7 +304,7 @@ int findById(char *sql)
 	PGconn *conn;
 	PGresult *ress;
 
-	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
 
 	if (PQstatus(conn) != CONNECTION_BAD){
 
