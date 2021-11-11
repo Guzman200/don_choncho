@@ -264,11 +264,51 @@ int main()
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
 
-			}else if(strstr(token, "select_ventas_credito"){
+			}else if(strstr(token, "ventas")){
 
-			}else if(strstr(token, "select_ventas_contado"){
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
 
-			}else if(strstr(token, "select_ventas_todas"){
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "ID VENTA: %s\nTOTAL $:%s\nID CLIENTE:%s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,2),PQgetvalue(ress,i,1));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "CLIENTE: %s %s %s\n\n", PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6),PQgetvalue(ress,i,7));
+							write(fd2, row, sizeof(row));
+						}
+
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
 
 			}
 		}

@@ -209,7 +209,7 @@ void executeServidorSelects(int argc, char *argv[], char comando[])
 		if(strstr(recibe,"terminar")){
 			break;
 		}else{
-			printf("%s\n", recibe);
+			printf("%s", recibe);
 		}
 	}
 
@@ -633,9 +633,9 @@ void reportes(int argc, char *argv[])
 				switch (opcV)
 				{
 				case 1:
-					printf("\n\n\n\n\tVentas a credito\n");
+					printf("\n\n\n\n\t===== VENTAS A CREDITO =====\n\n");
 
-					sprintf(cadena, "select_ventas_credito|SELECT * FROM ventas where credito = true;");
+					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = true;");
 
 					t_ini = clock();
 					executeServidorSelects(argc, argv, cadena);
@@ -646,9 +646,9 @@ void reportes(int argc, char *argv[])
 					break;
 
 				case 2:
-					printf("\n\n\n\n\tContado\n");
+					printf("\n\n\n\n\t ==== VENTAS DE CONTADO =====\n");
 
-					sprintf(cadena, "select_ventas_contado|SELECT * FROM ventas where credito = false;");
+					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = false;");
 
 					t_ini = clock();
 					executeServidorSelects(argc, argv, cadena);
@@ -659,9 +659,9 @@ void reportes(int argc, char *argv[])
 					break;
 
 				case 3:
-					printf("\n\n\n\n\tVer todas\n");
+					printf("\n\n\n\n\t===== TODAS LAS VENTAS =====\n");
 
-					sprintf(cadena, "select_ventas_todas|SELECT * FROM ventas");
+					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente;");
 
 					t_ini = clock();
 					executeServidorSelects(argc, argv, cadena);
