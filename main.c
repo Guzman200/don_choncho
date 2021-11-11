@@ -554,7 +554,7 @@ void reportes(int argc, char *argv[])
 {
 
 	int opcReportes, opcF, opcV, opcC, opcP, opcCF, opcCF2, opcC1, opcC2, opcC3, opcMes;
-	char cadenaC[500];
+	char cadenaC[500], cadena[500];
 	do
 	{
 		printf("REPORTES\n");
