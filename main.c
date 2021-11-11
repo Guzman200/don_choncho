@@ -618,8 +618,7 @@ void reportes(int argc, char *argv[])
 			break;
 		case 2:
 
-			do
-			{
+			do{
 				printf("VENTAS\n");
 				printf("\n\n\t1.-Consultar ventas (Credito)\n\n");
 				printf("\t2.-Consultar ventas (Contado)\n\n");
@@ -630,52 +629,51 @@ void reportes(int argc, char *argv[])
 				scanf("%d", &opcV);
 				system("clear");
 
-				switch (opcV)
-				{
-				case 1:
-					printf("\n\n\n\n\t===== VENTAS A CREDITO =====\n\n");
+				switch (opcV){
+					case 1:
+						printf("\n\n\n\n\t===== VENTAS A CREDITO =====\n\n");
 
-					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = true;");
+						sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = true;");
 
-					t_ini = clock();
-					executeServidorSelects(argc, argv, cadena);
-					t_fin = clock();
-					total= t_fin - t_ini;
-					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
-					break;
+						break;
 
-				case 2:
-					printf("\n\n\n\n\t ==== VENTAS DE CONTADO =====\n");
+					case 2:
+						printf("\n\n\n\n\t ==== VENTAS DE CONTADO =====\n");
 
-					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = false;");
+						sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente where v.credito = false;");
 
-					t_ini = clock();
-					executeServidorSelects(argc, argv, cadena);
-					t_fin = clock();
-					total= t_fin - t_ini;
-					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
-					break;
+						break;
 
-				case 3:
-					printf("\n\n\n\n\t===== TODAS LAS VENTAS =====\n");
+					case 3:
+						printf("\n\n\n\n\t===== TODAS LAS VENTAS =====\n");
 
-					sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente;");
+						sprintf(cadena, "ventas|select * from ventas v inner join clientes c on c.id_cliente = v.id_cliente;");
 
-					t_ini = clock();
-					executeServidorSelects(argc, argv, cadena);
-					t_fin = clock();
-					total= t_fin - t_ini;
-					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
-					break;
+						break;
 
-				case 4:
-					break;
+					case 4:
+						break;
 
-				default:
-					fflush(stdin);
+					default:
+						fflush(stdin);
 				}
 
 			} while (opcV != 4);
@@ -818,9 +816,8 @@ void reportes(int argc, char *argv[])
 			break;
 		case 4:
 
-			do
-			{
-				printf("PRODUCTOS\n");
+			do{
+				printf("\n\t==== REPORTE PRODUCTOS ====\n");
 				printf("\n\n\t1.-Ver productos mas vendidos\n\n");
 				printf("\t2.-Ver productos menos vendidos\n\n");
 				printf("\t3.-Ver productos en descuentos\n\n");
@@ -832,38 +829,55 @@ void reportes(int argc, char *argv[])
 				scanf("%d", &opcP);
 				system("clear");
 
-				switch (opcP)
-				{
-				case 1:
-					printf("\n\n\n\n\tVer productos mas vendidos\n");
+				switch (opcP){
 
-					break;
+					case 1:
+						printf("\n\n\n\n\t ====== VER PRODUCTOS MAS VENDIDOS ======\n");
 
-				case 2:
-					printf("\n\n\n\n\tVer productos menos vendidos\n");
+						sprintf(cadena, "reporte_productos|select m.id_mat,  m.nombre, sum(unidades) as cantidad from detalle_venta dv inner join materiales m on m.id_mat = dv.id_mat group by m.id_mat order by cantidad desc limit 1;");
 
-					break;
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
-				case 3:
-					printf("\n\n\n\n\tVer productos en descuentos\n");
+						break;
 
-					break;
+					case 2:
+						printf("\n\n\n\n\t===== VER PRODUCTOS MENOS VENDIDOS =====\n");
 
-				case 4:
-					printf("\n\n\n\n\tVer productos a credito\n");
+						sprintf(cadena, "reporte_productos|select m.id_mat,  m.nombre, sum(unidades) as cantidad from detalle_venta dv inner join materiales m on m.id_mat = dv.id_mat group by m.id_mat order by cantidad limit 1;");
 
-					break;
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
-				case 5:
-					printf("\n\n\n\n\tVer todos\n");
 
-					break;
+						break;
 
-				case 6:
-					break;
+					case 3:
+						printf("\n\n\n\n\tVer productos en descuentos\n");
 
-				default:
-					fflush(stdin);
+						break;
+
+					case 4:
+						printf("\n\n\n\n\tVer productos a credito\n");
+
+						break;
+
+					case 5:
+						printf("\n\n\n\n\tVer todos\n");
+
+						break;
+
+					case 6:
+						break;
+
+					default:
+						fflush(stdin);
 				}
 
 			} while (opcP != 6);

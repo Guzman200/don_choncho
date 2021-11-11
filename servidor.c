@@ -310,6 +310,50 @@ int main()
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
 
+			}else if(strstr(token, "reporte_productos")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nID: %s\nPRODUCTO: %s\nCANTIDAD:%s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2));
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+
 			}
 		}
 	}
