@@ -228,22 +228,25 @@ void selectMesOTodosClientes(int argc, char *argv[], int ban, int mes)
 	/*ban = bandera utilizada para crear los distintos tipos de consultas dentro de reportes, Clientes*/
 	switch (ban)
 	{
-	case 1:
+	case 1: /*CLIENTES CON DESCUENTO POR MES*/
 		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year')) AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
 		break;
 	
-	case 2:
+	case 2: /*CLIENTES CON DESCUENTO*/
 		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));");
 		break;
 	
-	case 3:
+	case 3: /*CLIENTES CON CREDITO POR MES*/
 		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE v.credito = TRUE AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
 		break;
 
-	case 4:
+	case 4: /*CLIENTES CON CREDITO*/
 		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE v.credito = TRUE;");
 		break;
-	
+
+	case 5: /*CLIENTES CON VENTAS*/
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta;");
+
 	default:
 		break;
 	}
@@ -745,26 +748,15 @@ void reportes(int argc, char *argv[])
 						case 1:
 							printf("\n\n\n\n\tClientes con descuentos\n");
 
-							sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));");
-
-							t_ini = clock();
-							executeServidorSelects(argc, argv, cadenaC);
-							t_fin = clock();
-							total= t_fin - t_ini;
-							printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+							selectMesOTodosClientes(argc,argv,2,opcMes);
 
 							break;
 
 						case 2:
 							printf("\n\n\n\n\tVer todos\n");
 
-							sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta;");
+							selectMesOTodosClientes(argc,argv,5,opcMes);
 
-							t_ini = clock();
-							executeServidorSelects(argc, argv, cadenaC);
-							t_fin = clock();
-							total= t_fin - t_ini;
-							printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 							break;
 
 						default:
