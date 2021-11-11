@@ -1,0 +1,48 @@
+--consulta CLIENTES CON DESCUENTO
+
+SELECT DISTINCT c.id_cliente,c.nombres, c.aPaterno, c.aMaterno, c.telefono, c.fecha_registro, c.limite_credito
+FROM clientes c
+LEFT JOIN ventas v ON v.id_cliente = c.id_cliente
+LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta
+WHERE dt.porcentaje > 0 
+AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));
+
+--consulta CLIENTES CON DESCUENTO POR MES
+
+SELECT DISTINCT c.id_cliente,c.nombres, c.aPaterno, c.aMaterno, c.telefono, c.fecha_registro, c.limite_credito
+FROM clientes c
+LEFT JOIN ventas v ON v.id_cliente = c.id_cliente
+LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta
+WHERE dt.porcentaje > 0 
+AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'))
+AND EXTRACT(MONTH FROM v.fecha_registro) = 10;
+
+--consulta CLIENTES CON CREDITO
+
+SELECT DISTINCT c.id_cliente,c.nombres, c.aPaterno, c.aMaterno, c.telefono, c.fecha_registro, c.limite_credito
+FROM clientes c
+LEFT JOIN ventas v ON v.id_cliente = c.id_cliente
+LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta
+WHERE v.credito = TRUE;
+
+--consulta CLIENTES CON CREDITO POR MES
+
+SELECT DISTINCT c.id_cliente,c.nombres, c.aPaterno, c.aMaterno, c.telefono, c.fecha_registro, c.limite_credito
+FROM clientes c
+LEFT JOIN ventas v ON v.id_cliente = c.id_cliente
+LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta
+WHERE v.credito = TRUE
+AND EXTRACT(MONTH FROM v.fecha_registro) = 10;
+---------------------------------------------------------------
+
+DATE_FORMAT(v.fecha_registro +( interval '1 year'),'%Y-%m-%d')
+
+SELECT * FROM clientes
+WHERE (NOW()::DATE >= fecha_registro +( interval '1 year'))
+AND EXTRACT(MONTH FROM fecha_registro) = 10;
+
+update ventas set fecha_registro = '2020-03-01' where id_venta = 1;
+update ventas set credito = true where id_venta = 3;
+
+update clientes set fecha_registro = '2020-12-01' where id_cliente = 1;
+update clientes set fecha_registro = '2021-10-10' where id_cliente = 2;

@@ -13,7 +13,7 @@
 /* netbd.h es necesitada por la estructura hostent ;-) */
 #define PORT 3550
 /* El Puerto Abierto del nodo remoto */
-#define MAXDATASIZE 100
+#define MAXDATASIZE 500
 /* El número máximo de datos en bytes */
 
 /* Prototipo de funciones */
@@ -196,7 +196,7 @@ void executeServidorSelects(int argc, char *argv[], char comando[])
 	bzero(envio, sizeof(envio));
 	bzero(recibe, sizeof(recibe));
 
-	char mensaje[200];
+	char mensaje[500];
 
 	copiar(mensaje, comando);
 
@@ -222,6 +222,39 @@ void copiar(char *destino, char *origen)
 		;
 }
 
+void selectMesOTodosClientes(int argc, char *argv[], int ban, int mes)
+{
+	char cadenaC[500];
+	/*ban = bandera utilizada para crear los distintos tipos de consultas dentro de reportes, Clientes*/
+	switch (ban)
+	{
+	case 1:
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year')) AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
+		break;
+	
+	case 2:
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));");
+		break;
+	
+	case 3:
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE v.credito = TRUE AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
+		break;
+
+	case 4:
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE v.credito = TRUE;");
+		break;
+	
+	default:
+		break;
+	}
+
+	t_ini = clock();
+	executeServidorSelects(argc, argv, cadenaC);
+	t_fin = clock();
+	total= t_fin - t_ini;
+	printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+	
+}
 /** ======== Funciones de MENU ======== */
 
 void ventas()
@@ -520,9 +553,8 @@ void productos()
 void reportes(int argc, char *argv[])
 {
 
-	int opcReportes, opcF, opcV, opcC, opcP, opcCF, opcCF2, opcC1, opcC2, opcC3;
-	char cadena[200];
-
+	int opcReportes, opcF, opcV, opcC, opcP, opcCF, opcCF2, opcC1, opcC2, opcC3, opcMes;
+	char cadenaC[500];
 	do
 	{
 		printf("REPORTES\n");
@@ -530,7 +562,7 @@ void reportes(int argc, char *argv[])
 		printf("\t2.-Ventas\n\n");
 		printf("\t3.-Clientes\n\n");
 		printf("\t4.-Productos\n\n");
-		printf("\t5.- Salir\n\n");
+		printf("\t5.-Regresar al menu principal\n\n");
 
 		printf("Elige una opcion:");
 		scanf("%d", &opcReportes);
@@ -700,10 +732,9 @@ void reportes(int argc, char *argv[])
 					do
 					{
 						printf("Consultar clientes\n");
-						printf("\n\n\t1.-Clientes con credito\n\n");
-						printf("\t2.-Clientes con descuentos\n\n");
-						printf("\t3.-Ver todos\n\n");
-						printf("\t4.-Salir\n\n");
+						printf("\n\n\t1.-Clientes con descuentos\n\n");
+						printf("\t2.-Ver todos\n\n");
+						printf("\t3.-Salir\n\n");
 
 						printf("Elige una opcion:");
 						scanf("%d", &opcC1);
@@ -712,27 +743,34 @@ void reportes(int argc, char *argv[])
 						switch (opcC1)
 						{
 						case 1:
-							printf("\n\n\n\n\tClientes con credito\n");
+							printf("\n\n\n\n\tClientes con descuentos\n");
+
+							sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));");
+
+							t_ini = clock();
+							executeServidorSelects(argc, argv, cadenaC);
+							t_fin = clock();
+							total= t_fin - t_ini;
+							printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 							break;
 
 						case 2:
-							printf("\n\n\n\n\tClientes con descuentos\n");
-
-							break;
-
-						case 3:
 							printf("\n\n\n\n\tVer todos\n");
 
-							break;
+							sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta;");
 
-						case 4:
+							t_ini = clock();
+							executeServidorSelects(argc, argv, cadenaC);
+							t_fin = clock();
+							total= t_fin - t_ini;
+							printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 							break;
 
 						default:
 							fflush(stdin);
 						}
-					} while (opcC1 != 4);
+					} while (opcC1 != 3);
 					break;
 
 				case 2:
@@ -751,15 +789,124 @@ void reportes(int argc, char *argv[])
 						{
 						case 1:
 							printf("\n\n\n\n\tPor mes\n");
+								do
+								{
+									printf("Meses");
+									printf("\n\n\t1.-Enero\n");
+									printf("\t2.-Febrero\n");
+									printf("\t3.-Marzo\n");
+									printf("\t4.-Abril\n");
+									printf("\t5.-Mayo\n");
+									printf("\t6.-Junio\n");
+									printf("\t7.-Julio\n");
+									printf("\t8.-Agosto\n");
+									printf("\t9.-Septiembre\n");
+									printf("\t10.-Octubre\n");
+									printf("\t11.-Noviembre\n");
+									printf("\t12.-Diciembre\n");
+									printf("\t13.-Salir\n");
+
+									printf("Elige una opcion:");
+									scanf("%d", &opcMes);
+									system("clear");
+
+									switch (opcMes)
+									{
+									case 1:
+										printf("\n\n\n\n\tEnero\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+
+									case 2:
+										printf("\n\n\n\n\tFebrero\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 3:
+										printf("\n\n\n\n\tMarzo\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									case 4:
+										printf("\n\n\n\n\tAbril\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 5:
+										printf("\n\n\n\n\tMayo\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 6:
+										printf("\n\n\n\n\tJunio\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 7:
+										printf("\n\n\n\n\tJulio\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 8:
+										printf("\n\n\n\n\tAgosto\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+
+									case 9:
+										printf("\n\n\n\n\tSeptiembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									
+									case 10:
+										printf("\n\n\n\n\tOctubre\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+									case 11:
+										printf("\n\n\n\n\tNoviembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);
+
+										break;
+									
+									case 12:
+										printf("\n\n\n\n\tDiciembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,1,opcMes);										
+
+										break;
+
+									default:
+										fflush(stdin);
+									}
+								} while (opcMes != 13);
+							
 
 							break;
 
 						case 2:
-							printf("\n\n\n\n\tVer todos\n");
+							printf("\n\n\n\n\tVer todos\n\n");
 
-							break;
+							selectMesOTodosClientes(argc,argv,2,opcMes);
 
-						case 3:
 							break;
 
 						default:
@@ -785,15 +932,124 @@ void reportes(int argc, char *argv[])
 						{
 						case 1:
 							printf("\n\n\n\n\tPor mes\n");
+								do
+								{
+									printf("Meses");
+									printf("\n\n\t1.-Enero\n");
+									printf("\t2.-Febrero\n");
+									printf("\t3.-Marzo\n");
+									printf("\t4.-Abril\n");
+									printf("\t5.-Mayo\n");
+									printf("\t6.-Junio\n");
+									printf("\t7.-Julio\n");
+									printf("\t8.-Agosto\n");
+									printf("\t9.-Septiembre\n");
+									printf("\t10.-Octubre\n");
+									printf("\t11.-Noviembre\n");
+									printf("\t12.-Diciembre\n");
+									printf("\t13.-Salir\n");
+
+									printf("Elige una opcion:");
+									scanf("%d", &opcMes);
+									system("clear");
+
+									switch (opcMes)
+									{
+									case 1:
+										printf("\n\n\n\n\tEnero\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+
+									case 2:
+										printf("\n\n\n\n\tFebrero\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 3:
+										printf("\n\n\n\n\tMarzo\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									case 4:
+										printf("\n\n\n\n\tAbril\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 5:
+										printf("\n\n\n\n\tMayo\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 6:
+										printf("\n\n\n\n\tJunio\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 7:
+										printf("\n\n\n\n\tJulio\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 8:
+										printf("\n\n\n\n\tAgosto\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+
+									case 9:
+										printf("\n\n\n\n\tSeptiembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									
+									case 10:
+										printf("\n\n\n\n\tOctubre\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+									case 11:
+										printf("\n\n\n\n\tNoviembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);
+
+										break;
+									
+									case 12:
+										printf("\n\n\n\n\tDiciembre\n\n");
+
+										selectMesOTodosClientes(argc,argv,3,opcMes);										
+
+										break;
+
+									default:
+										fflush(stdin);
+									}
+								} while (opcMes != 13);
+							
 
 							break;
 
 						case 2:
-							printf("\n\n\n\n\tVer todos\n");
+							printf("\n\n\n\n\tVer todos\n\n");
 
-							break;
+							selectMesOTodosClientes(argc,argv,4,opcMes);
 
-						case 3:
 							break;
 
 						default:
