@@ -234,7 +234,7 @@ int main()
 				down(idsem);
 				printf("\n ==== En region critica ====\n");
 
-				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
 
 				if (PQstatus(conn) != CONNECTION_BAD){
 
@@ -244,12 +244,12 @@ int main()
 
 					if(ress != NULL){
 
-						sprintf(row, "ID  |        NOMBRE COMPLETO        |   TELEFONO    |   REGISTRO   |     LIMITE CREDITO");
-						write(fd2, row, sizeof(row));
+						/*sprintf(row, "ID  |        NOMBRE COMPLETO        |   TELEFONO    |   REGISTRO   |     LIMITE CREDITO");
+						write(fd2, row, sizeof(row));*/
 
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "%s   |%s %s %s | %s | %s | %s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
+							sprintf(row, "ID CLIENTE: %s\nNOMBRE COMPLETO:%s %s %s\nTELEFONO: %s\nREGISTRO: %s \nLIMITE CREDITO %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
 
 							write(fd2, row, sizeof(row));
 						}
