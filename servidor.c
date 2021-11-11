@@ -234,7 +234,7 @@ int main()
 				down(idsem);
 				printf("\n ==== En region critica ====\n");
 
-				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
 
 				if (PQstatus(conn) != CONNECTION_BAD){
 
