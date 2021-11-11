@@ -289,14 +289,20 @@ int main()
 
 					ress = PQexec(conn, token);
 
+					sprintf(row, "-----------------------------------------------------------------------------\n");
+					write(fd2, row, sizeof(row));
+
 					if(ress != NULL){
 
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "ID VENTA: %s\nTOTAL $:%s\nID CLIENTE:%s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,2),PQgetvalue(ress,i,1));
+							sprintf(row, "ID VENTA   : %s\nTOTAL      : $%s\nID CLIENTE : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,2),PQgetvalue(ress,i,1));
 							write(fd2, row, sizeof(row));
 
-							sprintf(row, "CLIENTE: %s %s %s\n\n", PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6),PQgetvalue(ress,i,7));
+							sprintf(row, "CLIENTE    : %s %s %s\n\n", PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6),PQgetvalue(ress,i,7));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
 							write(fd2, row, sizeof(row));
 						}
 
@@ -339,7 +345,110 @@ int main()
 
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "\nID: %s\nPRODUCTO: %s\nCANTIDAD:%s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2));
+							sprintf(row, "\n\n-----------------------------------------------------------------------------");
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "\nID      : %s\nPRODUCTO: %s\nCANTIDAD: %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+
+			}else if(strstr(token, "prod_descuento")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nID PRODUCTO : %s\nPRODUCTO    : %s\nID CATEGORIA: %s\nCATEGORIA   : %s\nPORCENTAJE %: %s\nUNIDADADES  : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+
+			}else if(strstr(token, "prod_all")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nID PRODUCTO  : %s\nPRODUCTO     : %s\nMARCA        : %s\nPRECIO       : %s\nSTOCK        : %s\nSTOCK MIN    : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "ID CATEGORIA : %s\nCATEGORIA    : %s\nPORCENTAJE   : %s%\nUNIDADES     : %s\n", PQgetvalue(ress,i,6),  PQgetvalue(ress,i,7),PQgetvalue(ress,i,8),PQgetvalue(ress,i,9));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
 							write(fd2, row, sizeof(row));
 
 						}

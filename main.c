@@ -558,7 +558,6 @@ void reportes(int argc, char *argv[])
 	do
 	{
 		printf("REPORTES\n");
-		printf("\n\n\t1.-Facturas\n\n");
 		printf("\t2.-Ventas\n\n");
 		printf("\t3.-Clientes\n\n");
 		printf("\t4.-Productos\n\n");
@@ -568,86 +567,8 @@ void reportes(int argc, char *argv[])
 		scanf("%d", &opcReportes);
 		system("clear");
 
-		switch (opcReportes)
-		{
-		case 1:
-
-			do
-			{
-				printf("FACTURAS\n");
-				printf("\n\n\t1.-Crear Facturas (Credito)\n\n");
-				printf("\t2.-Crear Facturas (Contado)\n\n");
-				printf("\t3.-Consultar Facturas\n\n");
-				printf("\t4.-Salir\n\n");
-
-				printf("Elige una opcion:");
-				scanf("%d", &opcF);
-				system("clear");
-
-				switch (opcF)
-				{
-				case 1:
-					printf("\n\n\n\n\tCrear Facturas (Credito)\n");
-
-					break;
-
-				case 2:
-					printf("\n\n\n\n\tCrear Facturas (Contado)\n");
-
-					break;
-
-				case 3:
-
-					do
-					{
-						printf("Consultar Facturas\n");
-						printf("\n\n\t1.-Credito\n\n");
-						printf("\t2.-Contado\n\n");
-						printf("\t3.-Ver todas\n\n");
-						printf("\t4.-Salir\n\n");
-
-						printf("Elige una opcion:");
-						scanf("%d", &opcCF2);
-						system("clear");
-
-						switch (opcCF2)
-						{
-						case 1:
-							printf("\n\n\n\n\tCredito\n");
-
-							break;
-
-						case 2:
-							printf("\n\n\n\n\tContado\n");
-
-							break;
-
-						case 3:
-							printf("\n\n\n\n\tVer todas\n");
-
-							break;
-
-						case 4:
-							break;
-
-						default:
-							fflush(stdin);
-						}
-					} while (opcCF2 != 4);
-
-					break;
-
-				case 4:
-					break;
-
-				default:
-					fflush(stdin);
-				}
-
-			} while (opcF != 4);
-
-			system("clear");
-			break;
+		switch (opcReportes){
+		
 		case 2:
 
 			do{
@@ -655,9 +576,9 @@ void reportes(int argc, char *argv[])
 				printf("\n\n\t1.-Consultar ventas (Credito)\n\n");
 				printf("\t2.-Consultar ventas (Contado)\n\n");
 				printf("\t3.-Ver todas\n\n");
-				printf("\t4.-Salir\n\n");
+				printf("\t4.- <- Atras\n\n");
 
-				printf("Elige una opcion:");
+				printf("Elige una opcion: ");
 				scanf("%d", &opcV);
 				system("clear");
 
@@ -1074,12 +995,11 @@ void reportes(int argc, char *argv[])
 
 			do{
 				printf("\n\t==== REPORTE PRODUCTOS ====\n");
-				printf("\n\n\t1.-Ver productos mas vendidos\n\n");
-				printf("\t2.-Ver productos menos vendidos\n\n");
-				printf("\t3.-Ver productos en descuentos\n\n");
-				printf("\t4.-Ver productos a credito\n\n");
-				printf("\t5.-Ver todos\n\n");
-				printf("\t6.-Salir\n\n");
+				printf("\n\n\t1.- Ver productos mas vendidos\n\n");
+				printf("\t2.- Ver productos menos vendidos\n\n");
+				printf("\t3.- Ver productos en descuentos\n\n");
+				printf("\t4.- Ver todos\n\n");
+				printf("\t5.- <- Atras\n\n");
 
 				printf("Elige una opcion:");
 				scanf("%d", &opcP);
@@ -1115,28 +1035,38 @@ void reportes(int argc, char *argv[])
 						break;
 
 					case 3:
-						printf("\n\n\n\n\tVer productos en descuentos\n");
+						printf("\n\n\n\n\t ==== VER PRODUCTOS CON DESCUENTO ====\n");
+
+						sprintf(cadena, "prod_descuento|select m.id_mat, m.nombre as material, c.id_cat, c.nombre as categoria, t.porcentaje_max, t.unidades from materiales m inner join categorias c on c.id_cat = m.id_cat inner join tabulador t  on t.id_cat = c.id_cat;");
+
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 						break;
 
 					case 4:
-						printf("\n\n\n\n\tVer productos a credito\n");
+						printf("\n\n\n\n\t==== VER TODOS LOS PRODUCTOS ==== \n");
+
+						sprintf(cadena, "prod_all|select m.id_mat, m.nombre as material, m.marca, m.precio, m.stock, m.stock_min ,c.id_cat, c.nombre as categoria, t.porcentaje_max, t.unidades from materiales m inner join categorias c on c.id_cat = m.id_cat inner join tabulador t  on t.id_cat = c.id_cat;");
+
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 						break;
-
 					case 5:
-						printf("\n\n\n\n\tVer todos\n");
-
-						break;
-
-					case 6:
 						break;
 
 					default:
 						fflush(stdin);
 				}
 
-			} while (opcP != 6);
+			} while (opcP != 5);
 
 			system("clear");
 			break;
