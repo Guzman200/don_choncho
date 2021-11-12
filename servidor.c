@@ -217,7 +217,7 @@ int main()
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
 
-			}else if(strstr(token, "select")){
+			}else if(strstr(token, "select")){ // clientes
 
 				token = strtok(NULL, delimitador); // obtenemos el comando sql
 
@@ -246,8 +246,11 @@ int main()
 
 						for (i = 0; i < PQntuples(ress); i++){ //CREACION DE IMPRESION DATOS CLIENTE
 
-							sprintf(row, "ID CLIENTE: %s\nNOMBRE COMPLETO:%s %s %s\nTELEFONO: %s\nREGISTRO: %s \nLIMITE CREDITO %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
+							sprintf(row, "ID CLIENTE      : %s\nNOMBRE COMPLETO : %s %s %s\nTELEFONO        : %s\nREGISTRO        : %s \nLIMITE CREDITO  : %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
 
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
 							write(fd2, row, sizeof(row));
 						}
 
@@ -486,8 +489,11 @@ int main()
 
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "\t(1) ID: %s  \n\t(2) NOMBRE: %s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1));
+							sprintf(row, "ID      : %s  \nCATEGORIA : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1));
 
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
 							write(fd2, row, sizeof(row));
 						}
 
@@ -529,8 +535,11 @@ int main()
 
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "(1) ID: %s\n(2) ID CATEGORIA: %s\n(3) NOMBRE: %s\n(4) MARCA: %s\n(5) PRECIO: %s\n(6) STOCK: %s\n(7) STOCK MINIMO: %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),PQgetvalue(ress,i,6));
+							sprintf(row, "ID           : %s\nID CATEGORIA : %s\nNOMBRE       : %s\nMARCA        : %s\nPRECIO       : $%s\nSTOCK        : %s\nSTOCK MINIMO : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),PQgetvalue(ress,i,6));
 
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
 							write(fd2, row, sizeof(row));
 						}
 						write(fd2, "terminar", 8);

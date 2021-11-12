@@ -463,7 +463,7 @@ void clientes(int argc, char *argv[])
 			break;
 
 			case 2:
-				printf("\n\n\n\n\tConsulta de Clientes\n\n");
+				printf("\n\n\n\n\t ==== CONSULTA DE CLIENTES ====\n\n");
 
 				sprintf(cadena, "select|SELECT * FROM clientes;");
 
@@ -586,7 +586,7 @@ void categorias(int argc, char *argv[])
 		switch (opcCategorias)
 		{
 		case 1:
-			printf("\n\n\n\n\tAlta de Categorias\n");
+			printf("\n\n\n\n\t ==== CREACION DE CATEGORIA ====\n");
 
 				printf("Nombre Categoria: ");
 				scanf(" %[^\n]", nombre);
@@ -616,7 +616,7 @@ void categorias(int argc, char *argv[])
 			break;
 
 		case 2:
-			printf("\n\n\n\n\tConsulta de Categorias\n");
+			printf("\n\n\n\n\t ==== CONSULTA DE CATEGORIAS ====\n\n");
 
 				sprintf(cadenaCat, "sel_catego|SELECT * FROM categorias;");
 
@@ -629,7 +629,7 @@ void categorias(int argc, char *argv[])
 			break;
 
 		case 3:
-			printf("\n\n\n\n\tModificacion de datos de Categorias\n");
+			printf("\n\n\n\n\t ==== MODIFICACION DE CATEGORIAS ====\n");
 			printf("Dame el ID de la categoria: ");
 				scanf("%d", &id_cat);
 				sprintf(cadenaCat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
@@ -643,7 +643,7 @@ void categorias(int argc, char *argv[])
 
 				if(respuestaCat == 200){
 
-					printf("Categoria encontrada\n\n");
+					printf("==== Categoria encontrada ==== \n\n");
 
 					printf("Nombre: ");
 					scanf(" %[^\n]", nombre);
@@ -659,12 +659,12 @@ void categorias(int argc, char *argv[])
 					printf("\n ==== Categoria modificada correctamente ====\n\n");
 
 				}else{
-					printf("\n ==== Categoria no encontrado ====\n\n");
+					printf("\n ==== Categoria no encontrada ====\n\n");
 				}
 			break;
 
 		case 4:
-			printf("\n\n\n\n\tBaja de Categorias\n");
+			printf("\n\n\n\n\t ==== ELIMINACION DE CATEGORIA ====\n\n");
 			printf("Dame el ID de la Categoria: ");
 				scanf("%d", &id_cat);
 				sprintf(cadenaCat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
@@ -724,10 +724,36 @@ void productos(int argc, char *argv[])
 		switch (opcProducto)
 		{
 		case 1:
-			printf("\n\n\n\n\tAlta de Productos\n");
+			printf("\n\n\n\n\t ==== CREACION DE PRODUCTO =====\n\n");
 
-				printf("ID de la categoria: ");
-				scanf("%d", &id_cat);
+
+				respuesta = 0;
+
+				do{
+
+					printf("ID de la categoria: ");
+					scanf("%d", &id_cat);
+
+					sprintf(cadenaMat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+
+					respuesta = executeServidor(argc, argv, cadenaMat);
+
+					if(respuesta != 200){
+						printf("==== Categoria no encontrada, intente de nuevo ==== \n");
+						printf("Presione 1 para continuar, 2 para cancelar: ");
+						scanf("%d", &respuesta);
+
+						if(respuesta == 2 || respuesta != 1){
+							break;
+						}
+					}
+
+				}while (respuesta != 200);
+
+				if(respuesta != 200){
+					break;
+				}
+				
 			
 				printf("Nombre del Producto: ");
 				scanf(" %[^\n]",nombre);
@@ -738,10 +764,10 @@ void productos(int argc, char *argv[])
 				printf("Precio: ");
 				scanf("%f", &precio);
 
-				printf("stock: ");
+				printf("Stock inicial: ");
 				scanf("%d", &stock);
 
-				printf("stock_min: ");
+				printf("Stock minimo: ");
 				scanf("%d", &stock_min);
 
 
@@ -762,8 +788,8 @@ void productos(int argc, char *argv[])
 			break;
 
 		case 2:
-			printf("\n\n\n\n\tConsulta de Productos\n");
-			sprintf(cadenaMat, "sel_mate|SELECT * FROM materiales;");
+				printf("\n\n\n\n\t ==== CONSULTA DE PRODUCTOS ===== \n\n");
+				sprintf(cadenaMat, "sel_mate|SELECT * FROM materiales;");
 
 				t_ini = clock();
 				executeServidorSelects(argc, argv, cadenaMat);
@@ -773,8 +799,8 @@ void productos(int argc, char *argv[])
 			break;
 
 		case 3:
-			printf("\n\n\n\n\tModificacion de datos de Productos\n");
-			printf("Dame el ID del Producto: ");
+				printf("\n\n\n\n\t===== MODIFICACION DE PRODUCTO ===== \n\n");
+				printf("Dame el ID del Producto: ");
 				scanf("%d", &id_mat);
 				sprintf(cadenaMat, "findById|SELECT * FROM materiales WHERE id_mat = %d;", id_mat);
 
@@ -789,8 +815,33 @@ void productos(int argc, char *argv[])
 
 					printf("Producto encontrado\n\n");
 
-					printf("ID de la categoria: ");
-					scanf("%d", &id_cat);
+					respuesta = 0;
+
+					do{
+
+						
+						printf("ID de la categoria: ");
+						scanf("%d", &id_cat);
+
+						sprintf(cadenaMat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+
+						respuesta = executeServidor(argc, argv, cadenaMat);
+
+						if(respuesta != 200){
+							printf("==== Categoria no encontrada, intente de nuevo ==== \n");
+							printf("Presione 1 para continuar, 2 para cancelar: ");
+							scanf("%d", &respuesta);
+
+							if(respuesta == 2 || respuesta != 1){
+								break;
+							}
+						}
+
+					}while (respuesta != 200);
+
+					if(respuesta != 200){
+						break;
+					}
 
 					printf("Nombre del Producto: ");
 					scanf(" %[^\n]", nombre);
@@ -825,7 +876,7 @@ void productos(int argc, char *argv[])
 			break;
 
 		case 4:
-			printf("\n\n\n\n\tBaja de Productos\n");
+			printf("\n\n\n\n\t ==== ELIMINACION DE PRODUCTO ==== \n\n");
 			printf("Dame el ID del Producto: ");
 				scanf("%d", &id_mat);
 				sprintf(cadenaMat, "findById|SELECT * FROM materiales WHERE id_mat = %d;", id_mat);
