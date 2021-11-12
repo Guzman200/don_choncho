@@ -244,16 +244,138 @@ int main()
 
 					if(ress != NULL){
 
-						sprintf(row, "ID  |        NOMBRE COMPLETO        |   TELEFONO    |   REGISTRO   |     LIMITE CREDITO");
-						write(fd2, row, sizeof(row));
-
 						for (i = 0; i < PQntuples(ress); i++){ //filas
 
-							sprintf(row, "%s   |%s %s %s | %s | %s | %s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
+							sprintf(row, "(1) ID: %s\n(2) NOMBRE COMPLETO: %s %s %s\n(3) TELEFONO: %s\n(4) REGISTRO: %s\n(5) LIMITE CREDITO: %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),  PQgetvalue(ress,i,6));
 
 							write(fd2, row, sizeof(row));
 						}
 
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "sel_catego")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\t(1) ID: %s  \n\t(2) NOMBRE: %s", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1));
+
+							write(fd2, row, sizeof(row));
+						}
+
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "sel_mate")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "(1) ID: %s\n(2) ID CATEGORIA: %s\n(3) NOMBRE: %s\n(4) MARCA: %s\n(5) PRECIO: %s\n(6) STOCK: %s\n(7) STOCK MINIMO: %s\n\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1), PQgetvalue(ress,i,2), PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5),PQgetvalue(ress,i,6));
+
+							write(fd2, row, sizeof(row));
+						}
+						write(fd2, "terminar", 8);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "sel_tab")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+
+				PGconn *conn;
+				PGresult *ress;
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");3
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "(1) ID: %s\n(2) ID CATEGORIA\n(3) PORCENTAJE\n(4) UNIDADES\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3));
+
+							write(fd2, row, sizeof(row));
+						}
 						write(fd2, "terminar", 8);
 
 					}else{
