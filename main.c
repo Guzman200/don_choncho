@@ -264,24 +264,25 @@ void selectMesOTodosClientes(int argc, char *argv[], int ban, int mes)
 }
 /** ======== Funciones de MENU ======== */
 
+
+
 void ventas(int argc, char *argv[])
 {
 
     int listaMaterial[100],listaCantidad[100];
-    int material_ID,cantidadMaterial,cliente_ID;
+    int material_ID,cantidadMaterial,cliente_ID,venta_ID,flag=0,flagDos=0;
     char opcProducto;
     char cadena[200];
 
-	int opcVentas,respuesta,opcFormaDePago;
+	int opcVentas,opcVentas2,respuesta,opcFormaDePago;
 	do
 	{
 		///////////////////////////MENU DE VENTAS///////////////////////////
-		printf("VENTAS");
+		printf("\t ==== VENTAS ==== ");
 		printf("\n\n\t1.-Crear Venta\n\n");
 		printf("\t2.-Abonos\n\n");
 		printf("\t3.-Consultar Ventas\n\n");
-		printf("\t4.-Mofificar Ventas *\n\n");
-		printf("\t5.-Regresar al menu principal\n\n");
+		printf("\t4.-Regresar al menu principal\n\n");
 
 		printf("Elige una opcion:");
 		scanf("%d", &opcVentas);
@@ -290,7 +291,7 @@ void ventas(int argc, char *argv[])
 		switch (opcVentas)
 		{
 		case 1:
-			printf("\n\n\n\n\tCrear Venta\n");
+			printf("\n\n\n\n\t==== CREAR VENTA ==== \n");
 			
 			int i=0;
 
@@ -306,71 +307,90 @@ void ventas(int argc, char *argv[])
                     printf("Ingresa el ID del material: ");
                     scanf("%d", &material_ID);
 
-                    sprintf(cadena, "findById|SELECT * FROM materiales WHERE id_mat=%d",material_ID);
-                    respuesta = executeServidor(argc, argv, cadena);
+					for (int j = 0; j < i; j++)
+					{
+						if(material_ID==listaMaterial[j])
+						flagDos=1;
+					}
+					
+					if(flagDos!=1){
 
-                    if(respuesta==200){
-
-                        printf("Ingresa la cantidad: ");
-                        scanf("%d", &cantidadMaterial);
-						sprintf(cadena, "funcStock|SELECT VAL_STOCK(%d,%d);",material_ID,cantidadMaterial);
+						sprintf(cadena, "findById|SELECT * FROM materiales WHERE id_mat=%d",material_ID);
 						respuesta = executeServidor(argc, argv, cadena);
 
-						int bandera=0;
-
 						if(respuesta==200){
-							bandera=1;
-						}else if(respuesta==201){
-							printf("Advertencia: El stock esta por agotarse!");
-							bandera=1;
-						}else if(respuesta==404){
-							printf("No hay stock suficiente!");
-							bandera=0;
-						}
-                        
-						if(bandera==1){
-                            listaMaterial[i]=material_ID;
-							listaCantidad[i]=cantidadMaterial;
-                            i++;
-						}
-                        
-                    }else{
-                        printf("Material no encontrado!\n");
-                    }
 
-                    printf("\nDeseas agregar otro producto? (S/N) ");
+							printf("Ingresa la cantidad: ");
+							scanf("%d", &cantidadMaterial);
+							sprintf(cadena, "funcStock|SELECT VAL_STOCK(%d,%d);",material_ID,cantidadMaterial);
+							respuesta = executeServidor(argc, argv, cadena);
+
+							int bandera=0;
+
+							if(respuesta==200){
+								bandera=1;
+							}else if(respuesta==201){
+								printf("Advertencia: El stock esta por agotarse!");
+								bandera=1;
+							}else if(respuesta==404){
+								printf("No hay stock suficiente!");
+								bandera=0;
+							}
+							
+							if(bandera==1){
+								listaMaterial[i]=material_ID;
+								listaCantidad[i]=cantidadMaterial;
+								i++;
+								flag=1;
+							}
+							
+						}else{
+							printf("Material no encontrado!\n");
+						}
+					}else{
+						printf("Este producto ya ha sido agregado!\n");
+						flagDos=0;
+					}
+
+                    printf("\nDeseas agregar otro producto? (S/N) \n");
                     scanf("%s",&opcProducto);
                 }while(opcProducto=='S'||opcProducto=='s');
 				
-                printf("La compra sera a credito (1) o de contado (2)? ");
-                scanf("%d",&opcFormaDePago);
+				//printf("MAT: %d",listaMaterial[0]);
 
-				if(opcFormaDePago==1||opcFormaDePago==2){
+				if(flag==1){
+					printf("La compra sera a credito (1) o de contado (2)? ");
+					scanf("%d",&opcFormaDePago);
 
-					if(opcFormaDePago==1){
-						
-						sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, true);", cliente_ID);
-						respuesta = executeServidor(argc, argv, cadena);
+					if(opcFormaDePago==1||opcFormaDePago==2){
 
-                        for(int j=0;j<i;j++){
-                            sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,true,%d);",listaMaterial[j],listaCantidad[j]);
-						    respuesta = executeServidor(argc, argv, cadena);
-                        }
+						if(opcFormaDePago==1){
+							
+							sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, true);", cliente_ID);
+							respuesta = executeServidor(argc, argv, cadena);
 
-					}else if(opcFormaDePago==2){
-						
-						sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, false);", cliente_ID);
-						respuesta = executeServidor(argc, argv, cadena);
-						
-						for(int j=0;j<i;j++){
-                            sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,false,%d);",listaMaterial[j],listaCantidad[j]);
-						    respuesta = executeServidor(argc, argv, cadena);
-                        }
+							for(int j=0;j<i;j++){
+								sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,true,%d);",listaMaterial[j],listaCantidad[j]);
+								respuesta = executeServidor(argc, argv, cadena);
+							}
 
+						}else if(opcFormaDePago==2){
+							
+							sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, false);", cliente_ID);
+							respuesta = executeServidor(argc, argv, cadena);
+							
+							for(int j=0;j<i;j++){
+								sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,false,%d);",listaMaterial[j],listaCantidad[j]);
+								respuesta = executeServidor(argc, argv, cadena);
+							}
+
+						}
+
+						printf("\nCompra realizada con exito!\n\n");
+
+					}else{
+						printf("El metodo de pago no existe!\n");
 					}
-
-				}else{
-					printf("El metodo de pago no existe!\n");
 				}
 
             }else{
@@ -384,21 +404,72 @@ void ventas(int argc, char *argv[])
 			break;
 
 		case 3:
-			printf("\n\n\n\n\tConsultar Ventas\n");
-			break;
+
+			do{
+
+				printf("\t ==== VENTAS ==== \n");
+				printf("\n\n\t1.-Consultar todas las ventas\n\n");
+				printf("\t2.-Consultar detalle de venta\n\n");
+				printf("\t3.- <- Atras\n\n");
+
+				printf("Elige una opcion: ");
+				scanf("%d", &opcVentas2);
+				system("clear");
+
+				switch (opcVentas2)
+				{
+
+					case 1:
+						printf("\n\n\n\n\t==== VER TODAS LAS VENTAS ==== \n");
+
+						sprintf(cadena, "showVentas|SELECT ventas.id_venta, clientes.nombres, clientes.apaterno, clientes.amaterno, ventas.credito, ventas.total_venta, ventas.fecha_registro  FROM ventas INNER JOIN clientes ON ventas.id_cliente=clientes.id_cliente;");
+
+						t_ini = clock();
+						executeServidorSelects(argc, argv, cadena);
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+					break;
+
+					case 2:
+						printf("\n\n\n\n\t==== VER DETALLE DE VENTA ==== \n\n");
+
+						printf("Ingresa el ID de la venta: ");
+						scanf("%d",&venta_ID);
+
+						t_ini = clock();
+						sprintf(cadena, "showVentas|SELECT ventas.id_venta, clientes.nombres, clientes.apaterno, clientes.amaterno, ventas.credito, ventas.total_venta, ventas.fecha_registro  FROM ventas INNER JOIN clientes ON ventas.id_cliente=clientes.id_cliente WHERE ventas.id_venta = %d;",venta_ID);
+						executeServidorSelects(argc, argv, cadena);
+
+						sprintf(cadena, "DetalleVentas|SELECT materiales.nombre, detalle_venta.precio, detalle_venta.unidades, detalle_venta.porcentaje FROM detalle_venta INNER JOIN materiales ON detalle_venta.id_mat=materiales.id_mat WHERE detalle_venta.id_venta=%d",venta_ID);
+						executeServidorSelects(argc, argv, cadena);
+
+						t_fin = clock();
+						total= t_fin - t_ini;
+						printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+					break;
+
+					case 3:
+					break;
+
+					default:
+					printf("\n\n\n\n\tOpcion incorrecta! \n");
+					fflush(stdin);
+					break;
+				}
+
+			}while(opcVentas2!=3);
+
+		break;
 
 		case 4:
-			printf("\n\n\n\n\tModificar Ventas\n");
-			break;
-
-		case 5:
 			break;
 
 		default:
 			fflush(stdin);
 		}
 
-	} while (opcVentas != 5);
+	} while (opcVentas != 4);
 }
 
 void clientes(int argc, char *argv[])

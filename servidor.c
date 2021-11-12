@@ -637,6 +637,94 @@ int main()
 
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "showVentas")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+			
+				PGresult *ress;
+				PGconn *conn;
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nID VENTA          : %s\nNOMBRE DEL CLIENTE: %s %s %s \nCREDITO           : %s\nTOTAL DE LA VENTA : %s\nFECHA DE LA VENTA : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5), PQgetvalue(ress,i,6));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 9);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "DetalleVentas")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+			
+				PGresult *ress;
+				PGconn *conn;
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nMATERIAL          : %s\nPRECIO UNITARIO   : %s \nUNIDADES          : %s\nDESCUENTO APLICADO: %s%\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 9);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
 			}
 		}
 	}
