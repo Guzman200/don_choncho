@@ -998,11 +998,11 @@ void reportes(int argc, char *argv[])
 
 			do
 			{
-				printf("CLIENTES\n");
-				printf("\n\n\t1.-Consultar clientes\n\n");
-				printf("\t2.-Descuento de clientes\n\n");
-				printf("\t3.-Creditos de clientes\n\n");
-				printf("\t4.-Salir\n\n");
+				printf("\t ==== CLIENTES ==== \n");
+				printf("\n\n\t1.- Consultar clientes\n\n");
+				printf("\t2.- Descuento de clientes\n\n");
+				printf("\t3.- Creditos de clientes\n\n");
+				printf("\t4.- <- Atras\n\n");
 
 				printf("Elige una opcion:");
 				scanf("%d", &opcC);
@@ -1013,10 +1013,10 @@ void reportes(int argc, char *argv[])
 				case 1:
 					do
 					{
-						printf("Consultar clientes\n");
-						printf("\n\n\t1.-Clientes con descuentos\n\n");
-						printf("\t2.-Ver todos\n\n");
-						printf("\t3.-Salir\n\n");
+						printf("\t==== CONSULTAR CLIENTES\n\n");
+						printf("\n\n\t1.- Clientes con descuentos\n\n");
+						printf("\t2.- Ver todos\n\n");
+						printf("\t3.- <- Atras\n\n");
 
 						printf("Elige una opcion:");
 						scanf("%d", &opcC1);
@@ -1025,14 +1025,14 @@ void reportes(int argc, char *argv[])
 						switch (opcC1)
 						{
 						case 1:
-							printf("\n\n\n\n\tClientes con descuentos\n");
+							printf("\n\n\n\n\t==== CLIENTES CON DESCUENTO ==== \n");
 
 							selectMesOTodosClientes(argc,argv,2,opcMes);
 
 							break;
 
 						case 2:
-							printf("\n\n\n\n\tVer todos\n");
+							printf("\n\n\n\n\t ===== VER TODOS =====\n");
 
 							selectMesOTodosClientes(argc,argv,5,opcMes);
 
@@ -1059,10 +1059,10 @@ void reportes(int argc, char *argv[])
 						switch (opcC2)
 						{
 						case 1:
-							printf("\n\n\n\n\tPor mes\n");
+							printf("\n\n\n\n\t ===== POR MES ==== \n");
 								do
 								{
-									printf("Meses");
+									printf("\n\t==== MESES ====");
 									printf("\n\n\t1.-Enero\n");
 									printf("\t2.-Febrero\n");
 									printf("\t3.-Marzo\n");
@@ -1075,9 +1075,9 @@ void reportes(int argc, char *argv[])
 									printf("\t10.-Octubre\n");
 									printf("\t11.-Noviembre\n");
 									printf("\t12.-Diciembre\n");
-									printf("\t13.-Salir\n");
+									printf("\t13.-Salir\n\n");
 
-									printf("Elige una opcion:");
+									printf("Elige una opcion: ");
 									scanf("%d", &opcMes);
 									system("clear");
 
@@ -1202,10 +1202,10 @@ void reportes(int argc, char *argv[])
 						switch (opcC3)
 						{
 						case 1:
-							printf("\n\n\n\n\tPor mes\n");
+							printf("\n\n\n\n\t===== POR MES ==== \n");
 								do
 								{
-									printf("Meses");
+									printf("\t\n ====== MESES =====");
 									printf("\n\n\t1.-Enero\n");
 									printf("\t2.-Febrero\n");
 									printf("\t3.-Marzo\n");
@@ -1218,9 +1218,9 @@ void reportes(int argc, char *argv[])
 									printf("\t10.-Octubre\n");
 									printf("\t11.-Noviembre\n");
 									printf("\t12.-Diciembre\n");
-									printf("\t13.-Salir\n");
+									printf("\t13.- <- Atras\n\n");
 
-									printf("Elige una opcion:");
+									printf("Elige una opcion: ");
 									scanf("%d", &opcMes);
 									system("clear");
 
