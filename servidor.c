@@ -412,7 +412,9 @@ int main()
 
 			}else if(strstr(token, "prod_all")){
 
-
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+			
+				PGresult *ress;
 				PGconn *conn;
 
 				if (idsem < 0){
@@ -438,7 +440,7 @@ int main()
 							sprintf(row, "\nID PRODUCTO  : %s\nPRODUCTO     : %s\nMARCA        : %s\nPRECIO       : %s\nSTOCK        : %s\nSTOCK MIN    : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5));
 							write(fd2, row, sizeof(row));
 
-							sprintf(row, "ID CATEGORIA : %s\nCATEGORIA    : %s\nPORCENTAJE   : %s%\nUNIDADES     : %s\n", PQgetvalue(ress,i,6),  PQgetvalue(ress,i,7),PQgetvalue(ress,i,8),PQgetvalue(ress,i,9));
+							sprintf(row, "ID CATEGORIA : %s\nCATEGORIA    : %s\nPORCENTAJE   : %s\nUNIDADES     : %s\n", PQgetvalue(ress,i,6),  PQgetvalue(ress,i,7),PQgetvalue(ress,i,8),PQgetvalue(ress,i,9));
 							write(fd2, row, sizeof(row));
 
 							sprintf(row, "-----------------------------------------------------------------------------\n");
@@ -446,7 +448,7 @@ int main()
 
 						}
 
-						write(fd2, "terminar", 8);
+						write(fd2, "terminar", 9);
 
 					}else{
 						printf("Error al conectar a la base de datos");
@@ -540,6 +542,92 @@ int main()
 
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
+			}else if(strstr(token, "funcStock")){
+
+				idsem = crear_semaforo();
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				token = strtok(NULL, delimitador); // obtenemos los valores
+
+				PGconn *conn;
+				PGresult *ress;
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						sprintf(row, "%s", PQgetvalue(ress,0,0));
+
+						write(fd2, row, sizeof(row));
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
+
+			}else if(strstr(token, "ventas_all")){
+
+				token = strtok(NULL, delimitador); // obtenemos el comando sql
+			
+				PGresult *ress;
+				PGconn *conn;
+
+				if (idsem < 0){
+					perror("El semaforo no existe\n");
+					exit(0);
+				}
+
+				down(idsem);
+				printf("\n ==== En region critica ====\n");
+
+				conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
+
+				if (PQstatus(conn) != CONNECTION_BAD){
+
+					printf("Conectado a la base de datos\n");
+
+					ress = PQexec(conn, token);
+
+					if(ress != NULL){
+
+						for (i = 0; i < PQntuples(ress); i++){ //filas
+
+							sprintf(row, "\nID PRODUCTO  : %s\nPRODUCTO     : %s\nMARCA        : %s\nPRECIO       : %s\nSTOCK        : %s\nSTOCK MIN    : %s\n", PQgetvalue(ress,i,0),  PQgetvalue(ress,i,1),PQgetvalue(ress,i,2),PQgetvalue(ress,i,3), PQgetvalue(ress,i,4), PQgetvalue(ress,i,5));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "ID CATEGORIA : %s\nCATEGORIA    : %s\nPORCENTAJE   : %s\nUNIDADES     : %s\n", PQgetvalue(ress,i,6),  PQgetvalue(ress,i,7),PQgetvalue(ress,i,8),PQgetvalue(ress,i,9));
+							write(fd2, row, sizeof(row));
+
+							sprintf(row, "-----------------------------------------------------------------------------\n");
+							write(fd2, row, sizeof(row));
+
+						}
+
+						write(fd2, "terminar", 9);
+
+					}else{
+						printf("Error al conectar a la base de datos");
+					}
+				}
+
+				up(idsem);
+				printf("\n ==== Saliendo de region critica ==== \n");
 			}
 		}
 	}
@@ -551,7 +639,7 @@ void execute(char *sql)
 	PGconn *conn;
 	PGresult *ress;
 
-	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
+	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
 
 	if (PQstatus(conn) != CONNECTION_BAD){
 
@@ -581,7 +669,7 @@ int findById(char *sql)
 	PGconn *conn;
 	PGresult *ress;
 
-	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "123456");
+	conn = PQsetdbLogin("localhost", "5432", NULL, NULL, "don_concho", "postgres", "12345");
 
 	if (PQstatus(conn) != CONNECTION_BAD){
 

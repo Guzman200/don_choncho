@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 		switch (opc){
 
 			case 1:
-				ventas();
+				ventas(argc, argv);
 				break;
 
 			case 2:
@@ -140,6 +140,9 @@ int executeServidor(int argc, char *argv[], char comando[])
 	if (strstr(recibe, "200")){
 		//printf("\nOperacion exitosa...\n");
 		return 200;
+	}else if(strstr(recibe, "201")){
+		//printf("\nOperacion exitosa...\n");
+		return 201;
 	}else if(strstr(recibe, "404")){
 		//printf("\nRecurso no encontrado...");
 		return 404;
@@ -230,11 +233,11 @@ void selectMesOTodosClientes(int argc, char *argv[], int ban, int mes)
 	switch (ban)
 	{
 	case 1: /*CLIENTES CON DESCUENTO POR MES*/
-		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year')) AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres, c.aPaterno, c.aMaterno, c.telefono, c.fecha_registro, c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0  AND EXTRACT(MONTH FROM v.fecha_registro) = %d;",mes);
 		break;
 	
 	case 2: /*CLIENTES CON DESCUENTO*/
-		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0 AND (NOW()::DATE >= c.fecha_registro +( interval '1 year'));");
+		sprintf(cadenaC, "select|SELECT DISTINCT c.id_cliente,c.nombres,c.aPaterno,c.aMaterno,c.telefono,c.fecha_registro,c.limite_credito FROM clientes c LEFT JOIN ventas v ON v.id_cliente = c.id_cliente LEFT JOIN detalle_venta dt ON dt.id_venta = v.id_venta WHERE dt.porcentaje > 0;");
 		break;
 	
 	case 3: /*CLIENTES CON CREDITO POR MES*/
@@ -261,9 +264,15 @@ void selectMesOTodosClientes(int argc, char *argv[], int ban, int mes)
 }
 /** ======== Funciones de MENU ======== */
 
-void ventas()
+void ventas(int argc, char *argv[])
 {
-	int opcVentas;
+
+    int listaMaterial[100],listaCantidad[100];
+    int material_ID,cantidadMaterial,cliente_ID;
+    char opcProducto;
+    char cadena[200];
+
+	int opcVentas,respuesta,opcFormaDePago;
 	do
 	{
 		///////////////////////////MENU DE VENTAS///////////////////////////
@@ -282,7 +291,93 @@ void ventas()
 		{
 		case 1:
 			printf("\n\n\n\n\tCrear Venta\n");
-			break;
+			
+			int i=0;
+
+            printf("Ingresa el ID del cliente: ");
+            scanf("%d",&cliente_ID);
+
+            sprintf(cadena, "findById|SELECT * FROM clientes WHERE id_cliente=%d",cliente_ID);
+            respuesta = executeServidor(argc, argv, cadena);
+
+            if(respuesta==200){
+
+                do{
+                    printf("Ingresa el ID del material: ");
+                    scanf("%d", &material_ID);
+
+                    sprintf(cadena, "findById|SELECT * FROM materiales WHERE id_mat=%d",material_ID);
+                    respuesta = executeServidor(argc, argv, cadena);
+
+                    if(respuesta==200){
+
+                        printf("Ingresa la cantidad: ");
+                        scanf("%d", &cantidadMaterial);
+						sprintf(cadena, "funcStock|SELECT VAL_STOCK(%d,%d);",material_ID,cantidadMaterial);
+						respuesta = executeServidor(argc, argv, cadena);
+
+						int bandera=0;
+
+						if(respuesta==200){
+							bandera=1;
+						}else if(respuesta==201){
+							printf("Advertencia: El stock esta por agotarse!");
+							bandera=1;
+						}else if(respuesta==404){
+							printf("No hay stock suficiente!");
+							bandera=0;
+						}
+                        
+						if(bandera==1){
+                            listaMaterial[i]=material_ID;
+							listaCantidad[i]=cantidadMaterial;
+                            i++;
+						}
+                        
+                    }else{
+                        printf("Material no encontrado!\n");
+                    }
+
+                    printf("\nDeseas agregar otro producto? (S/N) ");
+                    scanf("%s",&opcProducto);
+                }while(opcProducto=='S'||opcProducto=='s');
+				
+                printf("La compra sera a credito (1) o de contado (2)? ");
+                scanf("%d",&opcFormaDePago);
+
+				if(opcFormaDePago==1||opcFormaDePago==2){
+
+					if(opcFormaDePago==1){
+						
+						sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, true);", cliente_ID);
+						respuesta = executeServidor(argc, argv, cadena);
+
+                        for(int j=0;j<i;j++){
+                            sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,true,%d);",listaMaterial[j],listaCantidad[j]);
+						    respuesta = executeServidor(argc, argv, cadena);
+                        }
+
+					}else if(opcFormaDePago==2){
+						
+						sprintf(cadena, "insert|INSERT INTO ventas (id_cliente, total_venta, credito) VALUES (%d, 0, false);", cliente_ID);
+						respuesta = executeServidor(argc, argv, cadena);
+						
+						for(int j=0;j<i;j++){
+                            sprintf(cadena, "insert|SELECT Insert_DetalleVenta(%d,false,%d);",listaMaterial[j],listaCantidad[j]);
+						    respuesta = executeServidor(argc, argv, cadena);
+                        }
+
+					}
+
+				}else{
+					printf("El metodo de pago no existe!\n");
+				}
+
+            }else{
+                printf("Cliente no encontrado!\n");
+            }   
+
+		break;
 
 		case 2:
 			printf("\n\n\n\n\tAbonos\n");
@@ -337,16 +432,16 @@ void clientes(int argc, char *argv[])
 
 
 				printf("Nombre: ");
-				scanf("%s", nombre);
+				scanf(" %[^\n]", nombre);
 
 				printf("Apellido paterno: ");
-				scanf("%s", paterno);
+				scanf(" %[^\n]", paterno);
 
 				printf("Apellido materno: ");
-				scanf("%s", materno);
+				scanf(" %[^\n]", materno);
 
 				printf("Telefono: ");
-				scanf("%s", telefono);
+				scanf(" %[^\n]", telefono);
 
 				printf("Limite de credito: ");
 				scanf("%f", &limite_credito);
@@ -399,16 +494,16 @@ void clientes(int argc, char *argv[])
 					printf("Cliente encontrado\n\n");
 
 					printf("Nombre: ");
-					scanf("%s", nombre);
+					scanf(" %[^\n]", nombre);
 
 					printf("Apellido paterno: ");
-					scanf("%s", paterno);
+					scanf(" %[^\n]", paterno);
 
 					printf("Apellido materno: ");
-					scanf("%s", materno);
+					scanf(" %[^\n]", materno);
 
 					printf("Telefono: ");
-					scanf("%s", telefono);
+					scanf(" %[^\n]", telefono);
 
 					printf("Limite de creadito: ");
 					scanf("%f", &limite_credito);
@@ -494,7 +589,7 @@ void categorias(int argc, char *argv[])
 			printf("\n\n\n\n\tAlta de Categorias\n");
 
 				printf("Nombre Categoria: ");
-				scanf("%s", nombre);
+				scanf(" %[^\n]", nombre);
 
 				printf("Porcentaje: ");
 				scanf("%d", &porcentaje);
@@ -551,7 +646,7 @@ void categorias(int argc, char *argv[])
 					printf("Categoria encontrada\n\n");
 
 					printf("Nombre: ");
-					scanf("%s", nombre);
+					scanf(" %[^\n]", nombre);
 
 					sprintf(cadenaCat, "insert|UPDATE categorias set nombre = '%s' where id_cat = '%d'", nombre, id_cat);
 
@@ -635,10 +730,10 @@ void productos(int argc, char *argv[])
 				scanf("%d", &id_cat);
 			
 				printf("Nombre del Producto: ");
-				scanf("%s", nombre);
+				scanf(" %[^\n]",nombre);
 
 				printf("Marca: ");
-				scanf("%s", marca);
+				scanf(" %[^\n]", marca);
 
 				printf("Precio: ");
 				scanf("%f", &precio);
@@ -692,30 +787,28 @@ void productos(int argc, char *argv[])
 
 				if(respuesta == 200){
 
-					printf("Cliente encontrado\n\n");
+					printf("Producto encontrado\n\n");
 
 					printf("ID de la categoria: ");
 					scanf("%d", &id_cat);
 
 					printf("Nombre del Producto: ");
-					scanf("%s", nombre);
+					scanf(" %[^\n]", nombre);
 
 					printf("Marca: ");
-					scanf("%s", marca);
+					scanf(" %[^\n]", marca);
 
 					printf("Precio: ");
 					scanf("%f", &precio);
 
-					printf("stock: ");
+					printf("Stock: ");
 					scanf("%d", &stock);
 
-					printf("stock_min: ");
+					printf("Stock minimo: ");
 					scanf("%d", &stock_min);
 
-					printf("id categoria: ");
-					scanf("%d", &id_cat);
 
-					sprintf(cadenaMat, "insert|UPDATE materiales set nombres = '%s', marca = '%s', precio = '%f', stock = '%d', stock_min = '%d, id_cat = '%d' where id_mat = %d", nombre, marca, precio, stock, stock_min, id_cat, id_mat);
+					sprintf(cadenaMat, "insert|UPDATE materiales set nombre = '%s', marca = '%s', precio = %f, stock = %d, stock_min = %d, id_cat = %d where id_mat = %d", nombre, marca, precio, stock, stock_min, id_cat, id_mat);
 
 					t_ini = clock();
 					respuesta = executeServidor(argc, argv, cadenaMat);
