@@ -412,12 +412,8 @@ int main()
 
 			}else if(strstr(token, "prod_all")){
 
-				token = strtok(NULL, delimitador); // obtenemos el comando sql
 
 				PGconn *conn;
-				PGresult *ress;
-
-				idsem = crear_semaforo();
 
 				if (idsem < 0){
 					perror("El semaforo no existe\n");
@@ -459,7 +455,6 @@ int main()
 
 				up(idsem);
 				printf("\n ==== Saliendo de region critica ==== \n");
-
 			}
 		}
 	}

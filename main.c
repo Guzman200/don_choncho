@@ -29,6 +29,7 @@ void reportes();
 
 clock_t t_ini, t_fin;
 double total;
+char tabu;
 
 int main(int argc, char *argv[])
 {
@@ -58,11 +59,11 @@ int main(int argc, char *argv[])
 				break;
 
 			case 3:
-				categorias();
+				categorias(argc, argv);
 				break;
 
 			case 4:
-				productos();
+				productos(argc, argv);
 				break;
 
 			case 5:
@@ -334,6 +335,7 @@ void clientes(int argc, char *argv[])
 
 				printf("\n\n\n\n\tAlta Clientes\n\n");
 
+
 				printf("Nombre: ");
 				scanf("%s", nombre);
 
@@ -349,7 +351,7 @@ void clientes(int argc, char *argv[])
 				printf("Limite de credito: ");
 				scanf("%f", &limite_credito);
 
-				sprintf(cadena, "insert|INSERT INTO clientes (nombres, aPaterno, aMaterno, telefono, limite_credito) VALUES ('%s', '%s', '%s', '%s', %f);", nombre, paterno, materno, telefono, limite_credito);
+				sprintf(cadena, "insert|INSERT INTO clientes (nombres, aPaterno, aMaterno, telefono, limite_credito) VALUES ('%s', '%s', '%s', '%s', '%f');", nombre, paterno, materno, telefono, limite_credito);
 
 				t_ini = clock();
 				respuesta = executeServidor(argc, argv, cadena);
@@ -411,7 +413,7 @@ void clientes(int argc, char *argv[])
 					printf("Limite de creadito: ");
 					scanf("%f", &limite_credito);
 
-					sprintf(cadena, "insert|UPDATE clientes set nombres = '%s', aPaterno = '%s', aMaterno = '%s', telefono = '%s', limite_credito = %f where id_cliente = %d", nombre, paterno, materno, telefono, limite_credito, cliente_id);
+					sprintf(cadena, "insert|UPDATE clientes set nombres = '%s', aPaterno = '%s', aMaterno = '%s', telefono = '%s', limite_credito = '%f' where id_cliente = '%d'", nombre, paterno, materno, telefono, limite_credito, cliente_id);
 
 					t_ini = clock();
 					respuesta = executeServidor(argc, argv, cadena);
@@ -463,9 +465,15 @@ void clientes(int argc, char *argv[])
 	} while (opcClientes != 5);
 }
 
-void categorias()
+void categorias(int argc, char *argv[])
 {
-	int opcCategorias;
+	char nombre[100];
+	int id_cat;
+	int porcentaje, unidades, tabulador;
+	char cadenaCat[200], cadenaTab[10];
+
+
+	int opcCategorias, respuestaCat;
 	do
 	{
 		///////////////////////////MENU DE CATEGORIAS///////////////////////////
@@ -484,18 +492,105 @@ void categorias()
 		{
 		case 1:
 			printf("\n\n\n\n\tAlta de Categorias\n");
+
+				printf("Nombre Categoria: ");
+				scanf("%s", nombre);
+
+				printf("Porcentaje: ");
+				scanf("%d", &porcentaje);
+
+				printf("Unidades: ");
+				scanf("%d", &unidades);
+
+				sprintf(cadenaCat, "insert|SELECT insertar_categoria('%s','%d','%d');", nombre,porcentaje,unidades);
+
+				t_ini = clock();
+				respuestaCat = executeServidor(argc, argv, cadenaCat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+
+				if(respuestaCat == 200){
+					printf("\n==== Categoria CREADA ====\n\n");
+				}else{
+					printf("\n==== Categoria NO CREADA :( ====\n\n");
+				}
+
+				
 			break;
 
 		case 2:
 			printf("\n\n\n\n\tConsulta de Categorias\n");
+
+				sprintf(cadenaCat, "sel_catego|SELECT * FROM categorias;");
+
+				t_ini = clock();
+				executeServidorSelects(argc, argv, cadenaCat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
 			break;
 
 		case 3:
 			printf("\n\n\n\n\tModificacion de datos de Categorias\n");
+			printf("Dame el ID de la categoria: ");
+				scanf("%d", &id_cat);
+				sprintf(cadenaCat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+
+				t_ini = clock();
+				respuestaCat = executeServidor(argc, argv, cadenaCat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+				
+
+				if(respuestaCat == 200){
+
+					printf("Categoria encontrada\n\n");
+
+					printf("Nombre: ");
+					scanf("%s", nombre);
+
+					sprintf(cadenaCat, "insert|UPDATE categorias set nombre = '%s' where id_cat = '%d'", nombre, id_cat);
+
+					t_ini = clock();
+					respuestaCat = executeServidor(argc, argv, cadenaCat);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+					printf("\n ==== Categoria modificada correctamente ====\n\n");
+
+				}else{
+					printf("\n ==== Categoria no encontrado ====\n\n");
+				}
 			break;
 
 		case 4:
 			printf("\n\n\n\n\tBaja de Categorias\n");
+			printf("Dame el ID de la Categoria: ");
+				scanf("%d", &id_cat);
+				sprintf(cadenaCat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+
+				respuestaCat = executeServidor(argc, argv, cadenaCat);
+
+				if(respuestaCat == 200){
+
+					sprintf(cadenaCat, "insert|DELETE FROM categorias where id_cat = %d", id_cat);
+
+					t_ini = clock();
+					respuestaCat = executeServidor(argc, argv, cadenaCat);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+					printf("\n==== Categoria eliminada ==== \n\n");
+
+				}else{
+					printf("\n==== Categoria no encontrado :( ====\n\n");
+				}
 			break;
 
 		case 5:
@@ -508,9 +603,16 @@ void categorias()
 	} while (opcCategorias != 5);
 }
 
-void productos()
+void productos(int argc, char *argv[])
 {
 	int opcProducto;
+	int respuesta;
+
+	char nombre[100], marca[100];
+	int id_mat, id_cat;
+	int stock, stock_min;
+	char cadenaMat[200];
+	float precio;
 	do
 	{
 		printf("PRODUCTOS");
@@ -528,18 +630,130 @@ void productos()
 		{
 		case 1:
 			printf("\n\n\n\n\tAlta de Productos\n");
+
+				printf("ID de la categoria: ");
+				scanf("%d", &id_cat);
+			
+				printf("Nombre del Producto: ");
+				scanf("%s", nombre);
+
+				printf("Marca: ");
+				scanf("%s", marca);
+
+				printf("Precio: ");
+				scanf("%f", &precio);
+
+				printf("stock: ");
+				scanf("%d", &stock);
+
+				printf("stock_min: ");
+				scanf("%d", &stock_min);
+
+
+				sprintf(cadenaMat, "insert|INSERT INTO materiales (id_cat, nombre, marca, precio, stock, stock_min) VALUES ('%d', '%s', '%s', '%f', '%d', '%d');",id_cat, nombre, marca, precio, stock, stock_min);
+
+				t_ini = clock();
+				respuesta = executeServidor(argc, argv, cadenaMat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+				if(respuesta == 200){
+					printf("\n==== PRODUCTO CREADO ====\n\n");
+				}else{
+					printf("\n==== PRODUCTO NO CREADO :( ====\n\n");
+				}
+
 			break;
 
 		case 2:
 			printf("\n\n\n\n\tConsulta de Productos\n");
+			sprintf(cadenaMat, "sel_mate|SELECT * FROM materiales;");
+
+				t_ini = clock();
+				executeServidorSelects(argc, argv, cadenaMat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 			break;
 
 		case 3:
 			printf("\n\n\n\n\tModificacion de datos de Productos\n");
+			printf("Dame el ID del Producto: ");
+				scanf("%d", &id_mat);
+				sprintf(cadenaMat, "findById|SELECT * FROM materiales WHERE id_mat = %d;", id_mat);
+
+				t_ini = clock();
+				respuesta = executeServidor(argc, argv, cadenaMat);
+				t_fin = clock();
+				total= t_fin - t_ini;
+				printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+				
+
+				if(respuesta == 200){
+
+					printf("Cliente encontrado\n\n");
+
+					printf("ID de la categoria: ");
+					scanf("%d", &id_cat);
+
+					printf("Nombre del Producto: ");
+					scanf("%s", nombre);
+
+					printf("Marca: ");
+					scanf("%s", marca);
+
+					printf("Precio: ");
+					scanf("%f", &precio);
+
+					printf("stock: ");
+					scanf("%d", &stock);
+
+					printf("stock_min: ");
+					scanf("%d", &stock_min);
+
+					printf("id categoria: ");
+					scanf("%d", &id_cat);
+
+					sprintf(cadenaMat, "insert|UPDATE materiales set nombres = '%s', marca = '%s', precio = '%f', stock = '%d', stock_min = '%d, id_cat = '%d' where id_mat = %d", nombre, marca, precio, stock, stock_min, id_cat, id_mat);
+
+					t_ini = clock();
+					respuesta = executeServidor(argc, argv, cadenaMat);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+					printf("\n ==== Producto modificado correctamente ====\n\n");
+
+				}else{
+					printf("\n ==== Producto no encontrado ====\n\n");
+				}
+
 			break;
 
 		case 4:
 			printf("\n\n\n\n\tBaja de Productos\n");
+			printf("Dame el ID del Producto: ");
+				scanf("%d", &id_mat);
+				sprintf(cadenaMat, "findById|SELECT * FROM materiales WHERE id_mat = %d;", id_mat);
+
+				respuesta = executeServidor(argc, argv, cadenaMat);
+
+				if(respuesta == 200){
+
+					sprintf(cadenaMat, "insert|DELETE FROM materiales where id_mat = %d", id_mat);
+
+					t_ini = clock();
+					respuesta = executeServidor(argc, argv, cadenaMat);
+					t_fin = clock();
+					total= t_fin - t_ini;
+					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
+
+					printf("\n==== Producto eliminado ==== \n\n");
+
+				}else{
+					printf("\n==== Producto no encontrado :( ====\n\n");
+				}
 			break;
 
 		case 5:
