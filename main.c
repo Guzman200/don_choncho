@@ -606,10 +606,9 @@ void categorias(int argc, char *argv[])
 
 
 	int opcCategorias, respuestaCat;
-	do
-	{
+	do {
 		///////////////////////////MENU DE CATEGORIAS///////////////////////////
-		printf("CATEGORIAS");
+		printf("\t ===== CATEGORIAS =====");
 		printf("\n\n\t1.-Alta Categorias\n\n");
 		printf("\t2.-Consulta de Categorias\n\n");
 		printf("\t3.-Modificacion de Datos de Categorias\n\n");
@@ -623,7 +622,7 @@ void categorias(int argc, char *argv[])
 		switch (opcCategorias)
 		{
 		case 1:
-			printf("\n\n\n\n\t ==== CREACION DE CATEGORIA ====\n");
+				printf("\n\n\n\n\t ==== CREACION DE CATEGORIA ====\n");
 
 				printf("Nombre Categoria: ");
 				scanf(" %[^\n]", nombre);
@@ -666,7 +665,7 @@ void categorias(int argc, char *argv[])
 			break;
 
 		case 3:
-			printf("\n\n\n\n\t ==== MODIFICACION DE CATEGORIAS ====\n");
+			printf("\n\n\n\n\t ==== MODIFICACION DE CATEGORIAS ====\n\n");
 			printf("Dame el ID de la categoria: ");
 				scanf("%d", &id_cat);
 				sprintf(cadenaCat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
@@ -737,7 +736,7 @@ void categorias(int argc, char *argv[])
 
 void productos(int argc, char *argv[])
 {
-	int opcProducto;
+	int opcProducto, opcEdit;
 	int respuesta;
 
 	char nombre[100], marca[100];
@@ -745,21 +744,19 @@ void productos(int argc, char *argv[])
 	int stock, stock_min;
 	char cadenaMat[200];
 	float precio;
-	do
-	{
-		printf("PRODUCTOS");
+	do{
+		printf("\t ====== PRODUCTOS ====== ");
 		printf("\n\n\t1.-Alta de Productos\n\n");
 		printf("\t2.-Consulta de Productos\n\n");
 		printf("\t3.-Modificacion de datos de Productos\n\n");
 		printf("\t4.-Baja de Productos\n\n");
-		printf("\t5.- Salir\n\n");
+		printf("\t5.- Regresar al menu principal\n\n");
 
-		printf("Elige una opcion:");
+		printf("Elige una opcion: ");
 		scanf("%d", &opcProducto);
 		system("clear");
 
-		switch (opcProducto)
-		{
+		switch (opcProducto){
 		case 1:
 			printf("\n\n\n\n\t ==== CREACION DE PRODUCTO =====\n\n");
 
@@ -850,53 +847,95 @@ void productos(int argc, char *argv[])
 
 				if(respuesta == 200){
 
-					printf("Producto encontrado\n\n");
+					printf("===== Producto encontrado ====== \n\n");
 
 					respuesta = 0;
 
-					do{
+					printf("[1] Categoria\n");
+					printf("[2] Nombre\n");
+					printf("[3] Marca\n");
+					printf("[4] Precio\n");
+					printf("[5] Stock\n");
+					printf("[6] Stock minimo\n\n");
+					printf("Opcion: ");
+					scanf("%d", &opcEdit);
 
+					respuesta = 200;
+
+					printf("\n");
+
+					switch (opcEdit)
+					{
+						case 1:
+
+							do{
+
+								printf("ID de la categoria: ");
+								scanf("%d", &id_cat);
+
+								sprintf(cadenaMat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+
+								respuesta = executeServidor(argc, argv, cadenaMat);
+
+								if(respuesta != 200){
+									printf("==== Categoria no encontrada, intente de nuevo ==== \n");
+									printf("Presione 1 para continuar, 2 para cancelar: ");
+									scanf("%d", &respuesta);
+
+									if(respuesta == 2 || respuesta != 1){
+										break;
+									}
+								}else{
+									sprintf(cadenaMat, "insert|UPDATE materiales set id_cat = %d where id_mat = %d", id_cat, id_mat);
+								}
+
+							}while (respuesta != 200);
+
+							break;
+
+						case 2:	
+								printf("Nombre del Producto: ");
+								scanf(" %[^\n]", nombre);
+
+								sprintf(cadenaMat, "insert|UPDATE materiales set nombre = '%s' where id_mat = %d", nombre, id_mat);
+							break;
+
+						case 3:
+								printf("Marca: ");
+								scanf(" %[^\n]", marca);
+								sprintf(cadenaMat, "insert|UPDATE materiales set marca = '%s' where id_mat = %d", marca, id_mat);
+							break;
+
+						case 4:
+								printf("Precio: $");
+								scanf("%f", &precio);
+								sprintf(cadenaMat, "insert|UPDATE materiales set precio = %f where id_mat = %d", precio, id_mat);
+							break;
+
+						case 5:
+								printf("Stock: ");
+								scanf("%d", &stock);
+								sprintf(cadenaMat, "insert|UPDATE materiales set stock = %d where id_mat = %d", stock, id_mat);
+							break;
+
+						case 6:
+								printf("Stock minimo: ");
+								scanf("%d", &stock_min);
+								sprintf(cadenaMat, "insert|UPDATE materiales set stock_min = %d where id_mat = %d", stock_min, id_mat);
+							break;
 						
-						printf("ID de la categoria: ");
-						scanf("%d", &id_cat);
+						default:
+							break;
 
-						sprintf(cadenaMat, "findById|SELECT * FROM categorias WHERE id_cat = %d;", id_cat);
+					} // end switch
 
-						respuesta = executeServidor(argc, argv, cadenaMat);
-
-						if(respuesta != 200){
-							printf("==== Categoria no encontrada, intente de nuevo ==== \n");
-							printf("Presione 1 para continuar, 2 para cancelar: ");
-							scanf("%d", &respuesta);
-
-							if(respuesta == 2 || respuesta != 1){
-								break;
-							}
-						}
-
-					}while (respuesta != 200);
-
-					if(respuesta != 200){
-						break;
+					if(respuesta != 200){ 
+						break;	
 					}
 
-					printf("Nombre del Producto: ");
-					scanf(" %[^\n]", nombre);
-
-					printf("Marca: ");
-					scanf(" %[^\n]", marca);
-
-					printf("Precio: ");
-					scanf("%f", &precio);
-
-					printf("Stock: ");
-					scanf("%d", &stock);
-
-					printf("Stock minimo: ");
-					scanf("%d", &stock_min);
-
-
-					sprintf(cadenaMat, "insert|UPDATE materiales set nombre = '%s', marca = '%s', precio = %f, stock = %d, stock_min = %d, id_cat = %d where id_mat = %d", nombre, marca, precio, stock, stock_min, id_cat, id_mat);
+					if( !(opcEdit >= 1 && opcEdit <= 6)){
+						break;
+					}
 
 					t_ini = clock();
 					respuesta = executeServidor(argc, argv, cadenaMat);
