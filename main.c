@@ -404,7 +404,7 @@ void ventas(int argc, char *argv[])
 void clientes(int argc, char *argv[])
 {
 
-	int opcClientes, respuesta;
+	int opcClientes, respuesta, opcEdit;
 
 	char nombre[100], paterno[100], materno[100], telefono[100];
 	int cliente_id;
@@ -414,7 +414,7 @@ void clientes(int argc, char *argv[])
 	do
 	{
 
-		printf("CLIENTES");
+		printf("\t ===== CLIENTES ===== \n");
 		printf("\n\n\t1.-Alta Clientes\n\n");
 		printf("\t2.-Consulta de Clientes\n\n");
 		printf("\t3.-Modificacion de Datos del Cliente\n\n");
@@ -476,7 +476,7 @@ void clientes(int argc, char *argv[])
 			break;
 
 			case 3:
-				printf("\n\n\n\n\tModificacion de datos de Clientes\n\n");
+				printf("\n\n\n\n\t ===== MODIFICACION DE CLIENTES ======\n\n");
 
 				printf("Dame el ID del cliente: ");
 				scanf("%d", &cliente_id);
@@ -491,24 +491,58 @@ void clientes(int argc, char *argv[])
 
 				if(respuesta == 200){
 
-					printf("Cliente encontrado\n\n");
+					printf("==== Cliente encontrado ==== \n\n");
 
-					printf("Nombre: ");
-					scanf(" %[^\n]", nombre);
+					printf("[1] Nombre\n");
+					printf("[2] Apellido paterno\n");
+					printf("[3] Apellido materno\n");
+					printf("[4] Telefono\n");
+					printf("[5] Limite de credito\n\n");
+					printf("Opcion: ");
+					scanf("%d", &opcEdit);
 
-					printf("Apellido paterno: ");
-					scanf(" %[^\n]", paterno);
+					printf("\n");
 
-					printf("Apellido materno: ");
-					scanf(" %[^\n]", materno);
+					switch (opcEdit){
 
-					printf("Telefono: ");
-					scanf(" %[^\n]", telefono);
+						case 1:
+							printf("Nombre: ");
+							scanf(" %[^\n]", nombre);
 
-					printf("Limite de creadito: ");
-					scanf("%f", &limite_credito);
+							sprintf(cadena, "insert|UPDATE clientes set nombres = '%s' where id_cliente = '%d'", nombre, cliente_id);
+							break;
 
-					sprintf(cadena, "insert|UPDATE clientes set nombres = '%s', aPaterno = '%s', aMaterno = '%s', telefono = '%s', limite_credito = '%f' where id_cliente = '%d'", nombre, paterno, materno, telefono, limite_credito, cliente_id);
+						case 2:
+							printf("Apellido paterno: ");
+							scanf(" %[^\n]", paterno);
+							sprintf(cadena, "insert|UPDATE clientes set aPaterno = '%s' where id_cliente = '%d'", paterno, cliente_id);
+							break;
+
+						case 3:
+							printf("Apellido materno: ");
+							scanf(" %[^\n]", materno);
+							sprintf(cadena, "insert|UPDATE clientes set aMaterno = '%s' where id_cliente = '%d'", materno, cliente_id);
+							break;
+
+						case 4:
+							printf("Telefono: ");
+							scanf(" %[^\n]", telefono);
+							sprintf(cadena, "insert|UPDATE clientes set telefono = '%s' where id_cliente = '%d'", telefono, cliente_id);
+							break;
+
+						case 5:
+							printf("Limite de credito: ");
+							scanf("%f", &limite_credito);
+							sprintf(cadena, "insert|UPDATE clientes set limite_credito = '%f' where id_cliente = '%d'", limite_credito, cliente_id);
+							break;
+						
+						default:
+							fflush(stdin);
+					}
+
+					if( !(opcEdit >= 1 && opcEdit <= 5)){
+						break;
+					}
 
 					t_ini = clock();
 					respuesta = executeServidor(argc, argv, cadena);
@@ -517,6 +551,9 @@ void clientes(int argc, char *argv[])
 					printf("\n==== Tiempo de ejecucion: %lf ====\n\n", total/ CLOCKS_PER_SEC);
 
 					printf("\n ==== Cliente modificado correctamente ====\n\n");
+					
+
+					
 
 				}else{
 					printf("\n ==== Cliente no encontrado ====\n\n");
