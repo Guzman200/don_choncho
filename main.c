@@ -918,11 +918,11 @@ void reportes(int argc, char *argv[])
 	char cadenaC[500], cadena[500];
 	do
 	{
-		printf("REPORTES\n");
-		printf("\t2.-Ventas\n\n");
-		printf("\t3.-Clientes\n\n");
-		printf("\t4.-Productos\n\n");
-		printf("\t5.-Regresar al menu principal\n\n");
+		printf("\t==== REPORTES ===== \n\n");
+		printf("\t1.-Ventas\n\n");
+		printf("\t2.-Clientes\n\n");
+		printf("\t3.-Productos\n\n");
+		printf("\t4.-Regresar al menu principal\n\n");
 
 		printf("Elige una opcion:");
 		scanf("%d", &opcReportes);
@@ -930,7 +930,7 @@ void reportes(int argc, char *argv[])
 
 		switch (opcReportes){
 		
-		case 2:
+		case 1:
 
 			do{
 				printf("VENTAS\n");
@@ -994,7 +994,7 @@ void reportes(int argc, char *argv[])
 
 			system("clear");
 			break;
-		case 3:
+		case 2:
 
 			do
 			{
@@ -1341,7 +1341,7 @@ void reportes(int argc, char *argv[])
 
 			system("clear");
 			break;
-		case 4:
+		case 3:
 
 			do{
 				printf("\n\t==== REPORTE PRODUCTOS ====\n");
@@ -1421,7 +1421,7 @@ void reportes(int argc, char *argv[])
 			system("clear");
 			break;
 
-		case 5:
+		case 4:
 			break;
 
 		default:
@@ -1429,5 +1429,5 @@ void reportes(int argc, char *argv[])
 
 		} //FIN SWITCH
 
-	} while (opcReportes != 5);
+	} while (opcReportes != 4);
 }
